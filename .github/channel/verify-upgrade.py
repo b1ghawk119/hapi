@@ -65,10 +65,19 @@ try:
             break
         time.sleep(1)
     assert after == {**before, 'versionCode': os.environ['TO']}, (before, after)
-    adb('shell', 'am', 'start', '-W', '-n', f'{PKG}/app.hapi.companion.MainActivity')
+    # PackageManager exposes the new version before finishing the replacement
+    # broadcast. A launch within that window can be discarded on Android 11.
+    print(f'In-place upgrade: {before} -> {after}', flush=True)
+    for attempt in range(3):
+        adb('shell', 'am', 'start', '-n', f'{PKG}/app.hapi.companion.MainActivity')
+        try:
+            wait_for({'pair with your hub'}, timeout=12)
+            break
+        except RuntimeError:
+            if attempt == 2:
+                raise
     assert 'HAPI update available' not in adb('exec-out', 'uiautomator', 'dump', '/dev/tty')
     shot('04-updated-app')
-    print(f'In-place upgrade: {before} -> {after}')
 finally:
     (evidence / 'last-screen.xml').write_text(adb('exec-out', 'uiautomator', 'dump', '/dev/tty'))
     shot('last-screen')

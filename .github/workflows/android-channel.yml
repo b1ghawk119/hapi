@@ -31,12 +31,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
-          code=$(git rev-list --count HEAD)
+          # The APK embeds its checkout's commit count. Docs and verifier-only
+          # changes do not produce a new APK or notify installed devices.
+          source=$(git rev-list -1 HEAD -- android shared/fixtures)
+          code=$(git rev-list --count "$source")
           tag=android-$code
           # Missing releases (including a previous failed build) are retried.
           published=$(gh api --paginate 'repos/{owner}/{repo}/releases?per_page=100' --jq ".[] | select(.tag_name == \"$tag\" and .draft == false) | .id")
           echo "publish=$([[ -z $published ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha=$source" >> "$GITHUB_OUTPUT"
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "upstream=$(cat .github/channel/upstream)" >> "$GITHUB_OUTPUT"
 
