@@ -1,0 +1,39 @@
+name: Check Android project folders
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  folders:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: cd android && ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          disable-animations: true
+          script: |
+            cd android && ./gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=app.hapi.companion.feature.home.HomeScreenTest#manualFolderCollapseHidesOnlyItsOwnRowsAndSurvivesARefresh' -Pandroid.testInstrumentationRunnerArguments.screenshots=true
+            adb pull /sdcard/Android/data/run.hapi.companion/files/toolbar-projects-expanded.png projects-expanded.png
+            adb pull /sdcard/Android/data/run.hapi.companion/files/toolbar-project-folded.png project-folded.png
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-folders
+          path: |
+            *.png
+            android/app/build/outputs/androidTest-results/
