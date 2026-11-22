@@ -45,7 +45,7 @@ private suspend fun download(context: Context, code: Int) = withContext(Dispatch
     val dir = dest.parentFile!!
     dir.mkdirs()
     if (dest.isFile) return@withContext
-    val tmp = File.createTempFile("download-", ".part", dir.parentFile)
+    val tmp = File.createTempFile("download-", ".apk", dir.parentFile)
     try {
         client.newCall(Request.Builder().url(apkUrl(code)).build()).execute().use { response ->
             if (!response.isSuccessful) throw IOException("HTTP ${response.code}")

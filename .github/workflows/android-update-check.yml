@@ -1,0 +1,39 @@
+name: Verify published Android upgrade
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Get the preceding published APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest=$(curl -fsSL "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/update.json" | jq -er .versionCode)
+          previous=$(gh api --paginate 'repos/{owner}/{repo}/releases?per_page=100' --jq '.[] | select(.draft == false) | .tag_name' | sed -nE 's/^android-([0-9]+)$/\1/p' | sort -n | awk -v n="$latest" '$1<n {prev=$1} END {print prev}')
+          test -n "$previous"
+          gh release download "android-$previous" -p HAPI.apk -D "$RUNNER_TEMP/previous"
+          echo "FROM=$previous" >> "$GITHUB_ENV"
+          echo "TO=$latest" >> "$GITHUB_ENV"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          disable-animations: true
+          script: python3 .github/channel/verify-upgrade.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: update-path
+          path: update-evidence
