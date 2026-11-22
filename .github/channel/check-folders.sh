@@ -9,5 +9,6 @@ adb shell am instrument -w -r \
     -e screenshots true run.hapi.companion.test/androidx.test.runner.AndroidJUnitRunner | tee folder-test.log
 grep -Fq 'OK (1 test)' folder-test.log
 for name in projects-expanded project-folded; do
-    adb pull "/sdcard/Android/data/run.hapi.companion/files/toolbar-$name.png" "$name.png"
+    adb exec-out run-as run.hapi.companion cat "/sdcard/Android/data/run.hapi.companion/files/toolbar-$name.png" > "$name.png"
+    file "$name.png" | grep -q "PNG image data"
 done
