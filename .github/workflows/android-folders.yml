@@ -26,14 +26,11 @@ jobs:
           api-level: 30
           arch: x86_64
           disable-animations: true
-          script: |
-            cd android && ./gradlew :app:connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=app.hapi.companion.feature.home.HomeScreenTest#manualFolderCollapseHidesOnlyItsOwnRowsAndSurvivesARefresh' -Pandroid.testInstrumentationRunnerArguments.screenshots=true
-            adb pull /sdcard/Android/data/run.hapi.companion/files/toolbar-projects-expanded.png projects-expanded.png
-            adb pull /sdcard/Android/data/run.hapi.companion/files/toolbar-project-folded.png project-folded.png
+          script: bash .github/channel/check-folders.sh
       - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: project-folders
           path: |
             *.png
-            android/app/build/outputs/androidTest-results/
+            folder-test.log
