@@ -212,10 +212,12 @@ class HomeScreenTest {
     }
 
     private fun capture(name: String) {
-        if (InstrumentationRegistry.getArguments().getString("screenshots") != "true") return
+        val mode = InstrumentationRegistry.getArguments().getString("screenshots")
+        if (mode != "true" && mode != "internal") return
         compose.waitForIdle()
         val bitmap = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
-        File(context.getExternalFilesDir(null), "toolbar-$name.png").outputStream().use {
+        val directory = if (mode == "internal") context.filesDir else context.getExternalFilesDir(null)
+        File(directory, "toolbar-$name.png").outputStream().use {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
         }
     }
