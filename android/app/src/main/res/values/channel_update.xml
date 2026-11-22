@@ -1,0 +1,9 @@
+<resources>
+    <string name="channel_update_title">HAPI update available</string>
+    <string name="channel_update_message">Install %1$s from your GitHub channel. Android will ask before replacing the app.</string>
+    <string name="channel_update_later">Later</string>
+    <string name="channel_update_install">Download and install</string>
+    <string name="channel_update_downloading">Downloading…</string>
+    <string name="channel_update_fallback">The installer could not open. You can download the same signed APK in your browser.</string>
+    <string name="channel_update_browser">Download in browser</string>
+</resources>

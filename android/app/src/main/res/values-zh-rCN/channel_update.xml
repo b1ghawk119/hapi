@@ -1,0 +1,9 @@
+<resources>
+    <string name="channel_update_title">HAPI 有新版本</string>
+    <string name="channel_update_message">GitHub 通道已发布 %1$s。下载后，Android 会请你确认覆盖安装。</string>
+    <string name="channel_update_later">稍后提醒</string>
+    <string name="channel_update_install">下载并安装</string>
+    <string name="channel_update_downloading">正在下载…</string>
+    <string name="channel_update_fallback">应用内升级未完成。你可以用浏览器下载同一份签名 APK，再点开安装。</string>
+    <string name="channel_update_browser">用浏览器下载</string>
+</resources>

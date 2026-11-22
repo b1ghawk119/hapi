@@ -91,12 +91,16 @@ if (officialBuild) {
     }
 }
 
+val githubChannel = providers.gradleProperty("hapiGithubChannel").map(String::toBooleanStrict).orElse(false).get()
+
 android {
+    if (githubChannel) sourceSets.getByName("release").manifest.srcFile("src/channel/AndroidManifest.xml")
     namespace = "app.hapi.companion"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "run.hapi.companion"
+        applicationId = if (githubChannel) "run.hapi.companion.b1ghawk119" else "run.hapi.companion"
+        buildConfigField("boolean", "GITHUB_CHANNEL", githubChannel.toString())
         minSdk = 26
         targetSdk = 36
         versionCode = gitCommitCount ?: 1

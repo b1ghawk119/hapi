@@ -1,0 +1,9 @@
+<resources>
+    <string name="channel_update_title">HAPI のアップデート</string>
+    <string name="channel_update_message">GitHub から %1$s をダウンロードできます。インストール前に Android が確認します。</string>
+    <string name="channel_update_later">後で</string>
+    <string name="channel_update_install">ダウンロードして更新</string>
+    <string name="channel_update_downloading">ダウンロード中…</string>
+    <string name="channel_update_fallback">アプリ内での更新を完了できませんでした。ブラウザから同じ署名済み APK をダウンロードできます。</string>
+    <string name="channel_update_browser">ブラウザでダウンロード</string>
+</resources>

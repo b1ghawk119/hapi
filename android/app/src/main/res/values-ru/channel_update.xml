@@ -1,0 +1,9 @@
+<resources>
+    <string name="channel_update_title">Доступно обновление HAPI</string>
+    <string name="channel_update_message">Версия %1$s доступна на GitHub. Android запросит подтверждение установки.</string>
+    <string name="channel_update_later">Позже</string>
+    <string name="channel_update_install">Скачать и установить</string>
+    <string name="channel_update_downloading">Загрузка…</string>
+    <string name="channel_update_fallback">Не удалось обновить приложение. Вы можете скачать тот же подписанный APK в браузере.</string>
+    <string name="channel_update_browser">Скачать в браузере</string>
+</resources>

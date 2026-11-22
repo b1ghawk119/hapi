@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
             ) {
                 CompositionLocalProvider(LocalAppGraph provides appGraph) {
                     HapiNavigation()
+                    if (BuildConfig.GITHUB_CHANNEL) ChannelUpdatePrompt()
                 }
             }
         }

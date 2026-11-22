@@ -1,3 +1,13 @@
+## Android · GitHub 自建更新通道
+
+**[下载最新签名 APK](https://github.com/b1ghawk119/hapi/releases/latest/download/HAPI.apk)** · [发行记录](https://github.com/b1ghawk119/hapi/releases) · [自动构建](https://github.com/b1ghawk119/hapi/actions/workflows/android-channel.yml)
+
+首次安装后，打开 App 即可配对自己的 Hub。新版本会在 App 处于前台时提示，点「下载并安装」，首次允许 HAPI 安装未知应用，再由 Android 确认升级。覆盖安装保留配对和应用数据。与 Play 版包名不同，可以并存；首次使用本通道需要单独配对。本构建未配置 Firebase，不提供 FCM 推送；官方通行密钥也不适用于此签名。
+
+`android-channel` 是本 fork 的默认发布分支。Actions 每三小时检查 `tiann/hapi:main` 的 `android/` 和 `shared/fixtures/`，有变化才同步；手动运行同一工作流可立即检查。每次发布包含对应源码、签名 APK 和应用读取的 `update.json`。同步冲突时保留现有发行版：在发布分支手动合并对应上游改动、更新 `.github/channel/upstream` 至已整合的上游 Android 提交，再运行工作流。失败的构建会在下次检查时重试。GitHub 可能会在公共仓库连续 60 天没有活动后暂停定时工作流；可在 Actions 重新启用。请保留签名密钥备份，勿重置发布分支历史（版本号采用提交计数）。
+
+---
+
 # HAPI
 
 Run official Claude Code / Codex / Cursor Agent / Grok Build / OpenCode / Kimi / Copilot / Antigravity / Pi / DeepSeek Harness sessions and control them remotely through native iOS / Android apps, Web / PWA, or Telegram Mini App.
