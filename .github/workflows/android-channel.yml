@@ -38,6 +38,17 @@ jobs:
           tag=android-$code
           # Missing releases (including a previous failed build) are retried.
           published=$(gh api --paginate 'repos/{owner}/{repo}/releases?per_page=100' --jq ".[] | select(.tag_name == \"$tag\" and .draft == false) | .id")
+          if [[ -z $published ]]; then
+            # Pin the channel tip before the long build. A docs/workflow-only
+            # commit can follow the source; the tag must identify the same APK
+            # inputs without requiring permission to recreate historical workflows.
+            if git show-ref --verify --quiet "refs/tags/$tag"; then
+              tagged_source=$(git rev-list -1 "refs/tags/$tag" -- android shared/fixtures)
+              [[ "$tagged_source" == "$source" ]]
+            else
+              git push origin "HEAD:refs/tags/$tag"
+            fi
+          fi
           echo "publish=$([[ -z $published ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "sha=$source" >> "$GITHUB_OUTPUT"
           echo "code=$code" >> "$GITHUB_OUTPUT"
@@ -108,7 +119,7 @@ jobs:
           set -euo pipefail
           tag=android-$CODE
           if ! gh release view "$tag" >/dev/null 2>&1; then
-            gh release create "$tag" --target "$SHA" --draft --title "HAPI Android $(jq -r .versionName update.json)" \
+            gh release create "$tag" --verify-tag --draft --title "HAPI Android $(jq -r .versionName update.json)" \
               --notes "Install **HAPI.apk**. Future updates appear inside the app. 首次安装请选择 HAPI.apk；后续可在应用内升级。 Upstream Android: https://github.com/tiann/hapi/commit/$UPSTREAM · Fork source: https://github.com/$GH_REPO/commit/$SHA"
           fi
           gh release upload "$tag" HAPI.apk update.json --clobber
