@@ -309,6 +309,7 @@ export default {
   'session.action.pinFailed': 'Не удалось изменить закрепление',
   'sessions.pinnedSection': 'Закреплённые сессии',
   'session.action.export': 'Экспортировать диалог',
+  'session.action.markRead': 'Отметить как прочитанную',
   'session.action.markUnread': 'Отметить как непрочитанную',
   'session.action.syncCodex': 'Синхронизировать Codex',
   'session.action.syncPi': 'Синхронизировать историю Pi',

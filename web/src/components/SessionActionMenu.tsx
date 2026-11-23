@@ -8,6 +8,27 @@ import { useAnchoredMenu } from '@/hooks/useAnchoredMenu'
 import { ArchiveIcon, CopyIcon, ForkIcon } from '@/components/icons'
 import { buildSessionWindowPath } from '@/lib/sessionNavigation'
 
+import { getUnreadSessionCount, markAllSessionsSeen, markSessionUnread, useSessionLastSeenVersion } from '@/lib/sessionLastSeen'
+import type { SessionSummary } from '@/types/api'
+
+type ReadTarget = Pick<SessionSummary, 'id' | 'contentRevision' | 'readState'>
+
+function ReadAction({ session, className, onClose }: { session: ReadTarget; className: string; onClose: () => void }) {
+    const { t } = useTranslation()
+    useSessionLastSeenVersion()
+    const unread = getUnreadSessionCount([session]) > 0
+    return (
+        <button type="button" role="menuitem" className={className} onClick={() => {
+            onClose()
+            if (unread) markAllSessionsSeen([session])
+            else markSessionUnread(session.id, session.readState)
+        }}>
+            <UnreadIcon className="text-[var(--app-hint)]" />
+            {t(unread ? 'session.action.markRead' : 'session.action.markUnread')}
+        </button>
+    )
+}
+
 export type SessionActionMenuLinkedPr = {
     /** Chip glyph (emoji / `PR` / `?`) — leading the status explanation. */
     glyph: string
@@ -31,7 +52,7 @@ type SessionActionMenuProps = {
     sessionGlobalPinned?: boolean
     onSetPinMode?: (mode: 'none' | 'project' | 'global') => void
     onExport?: () => void
-    onMarkUnread?: () => void
+    readTarget?: ReadTarget
     onForkSession?: () => void
     forkDisabledReason?: string
     onSyncCodex?: () => void
@@ -216,7 +237,7 @@ export function SessionActionMenu(props: SessionActionMenuProps) {
         sessionGlobalPinned = false,
         onSetPinMode,
         onExport,
-        onMarkUnread,
+        readTarget,
         onForkSession,
         forkDisabledReason,
         onSyncCodex,
@@ -272,11 +293,6 @@ export function SessionActionMenu(props: SessionActionMenuProps) {
     const handleExport = () => {
         onClose()
         onExport?.()
-    }
-
-    const handleMarkUnread = () => {
-        onClose()
-        onMarkUnread?.()
     }
 
     const handleForkSession = () => {
@@ -421,17 +437,8 @@ export function SessionActionMenu(props: SessionActionMenuProps) {
                     </a>
                 ) : null}
 
-                {onMarkUnread ? (
-                    <button
-                        type="button"
-                        role="menuitem"
-                        className={`${baseItemClassName} hover:bg-[var(--app-subtle-bg)]`}
-                        onClick={handleMarkUnread}
-                    >
-                        <UnreadIcon className="text-[var(--app-hint)]" />
-                        {t('session.action.markUnread')}
-                    </button>
-                ) : null}
+                {readTarget ? <ReadAction session={readTarget} onClose={onClose}
+                    className={`${baseItemClassName} hover:bg-[var(--app-subtle-bg)]`} /> : null}
 
                 {onSetPinMode ? (
                     <>
